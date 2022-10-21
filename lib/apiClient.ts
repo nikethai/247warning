@@ -52,11 +52,9 @@ export async function getAllPostsWithSlug() {
   const data = await fetchAPI(`
     {
       posts(first: 10000) {
-        edges {
-          node {
+          nodes {
             slug
           }
-        }
       }
     }
   `);
@@ -108,8 +106,8 @@ export async function getAllPostsForHome(preview: boolean = false) {
 
 export async function getPostAndMorePosts(
   slug: any,
-  preview: any,
-  previewData: { post: any }
+  preview: boolean = false,
+  previewData: { post: any } = { post: null }
 ) {
   const postPreview = preview && previewData?.post;
   // The slug may be the id of an unpublished post
@@ -219,5 +217,34 @@ export async function getPostAndMorePosts(
   // If there are still 3 posts, remove the last one
   if (data.posts.edges.length > 2) data.posts.edges.pop();
 
+  return data;
+}
+
+export async function getPostDetail(slug: string) {
+  const data = await fetchAPI(
+    `query PostBySlug($id: ID!, $idType: PostIdType!) {
+      post(id: $id, idType: $idType) {
+        id
+        title
+        excerpt
+        content
+        slug
+        categories {
+          nodes {
+            id
+            name
+            link
+          }
+        }
+        date
+      }
+    }`,
+    {
+      variables: {
+        id: slug,
+        idType: "SLUG",
+      },
+    }
+  );
   return data;
 }

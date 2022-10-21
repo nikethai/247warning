@@ -149,10 +149,7 @@ export function CustomFooter({ data }: FooterLinksProps) {
     <footer className={classes.footer}>
       <Container size="lg" className={classes.inner}>
         <div className={classes.logo}>
-          <img src="./images/icon.png" alt="" width={100}/>
-          <Text size="xs" color="dimmed" className={classes.description}>
-            Build fully functional accessible web applications faster than ever
-          </Text>
+          <img src="/247logo.png" alt="" width={150}/>
         </div>
         <div className={classes.groups}>{groups}</div>
       </Container>

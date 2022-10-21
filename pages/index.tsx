@@ -16,6 +16,8 @@ import MainLayout from '../components/layout'
 import { NextPageWithLayout } from './_app'
 import HeroNews from '../components/heroNews';
 import { getAllPostsForHome } from '../lib/apiClient';
+import { formatDateInVNHomePage } from '../lib/util';
+import SideTabs from '../components/sideTabs';
 
 const Home: NextPageWithLayout = ({ allPosts: { nodes } }: any) => {
   const autoplay = React.useRef(Autoplay({ delay: 6000 }));
@@ -35,7 +37,7 @@ const Home: NextPageWithLayout = ({ allPosts: { nodes } }: any) => {
                 >
                   <Carousel.Slide>
                     <HeroNews
-                      heroImg="./images/n-a.jpeg"
+                      heroImg="/images/n-a.jpeg"
                       heroText=" Nakiri Ayame (百鬼あやめ) is a female Japanese Virtual
                             YouTuber associated with hololive, debuting as part of
                             its second generation of VTubers alongside Minato
@@ -45,21 +47,21 @@ const Home: NextPageWithLayout = ({ allPosts: { nodes } }: any) => {
                   </Carousel.Slide>
                   <Carousel.Slide>
                     <HeroNews
-                      heroImg="./images/m-a.jpg"
+                      heroImg="/images/m-a.jpg"
                       heroText="Minato Aqua (湊あくあ) is a female Japanese Virtual YouTuber associated with hololive, debuting as part of its second generation of VTubers alongside Murasaki Shion, Nakiri Ayame, Yuzuki Choco and Oozora Subaru."
                       heroStat=""
                     />
                   </Carousel.Slide>
                   <Carousel.Slide>
                     <HeroNews
-                      heroImg="./images/m-s.jpg"
+                      heroImg="/images/m-s.jpg"
                       heroText="Murasaki Shion (紫咲シオン) is a female Japanese Virtual YouTuber associated with hololive, debuting as part of its second generation of VTubers alongside Minato Aqua, Nakiri Ayame, Yuzuki Choco and Oozora Subaru."
                       heroStat=""
                     />
                   </Carousel.Slide>
                   <Carousel.Slide>
                     <HeroNews
-                      heroImg="./images/gen2.jpg"
+                      heroImg="/images/gen2.jpg"
                       heroText="Hololive Gen 2 (ホロライブ第二期) is the second generation of VTubers associated with hololive, debuting on 2020-07-03. The group consists of Minato Aqua, Murasaki Shion, Nakiri Ayame, Yuzuki Choco and Oozora Subaru."
                       heroStat=""
                     />
@@ -87,7 +89,7 @@ const Home: NextPageWithLayout = ({ allPosts: { nodes } }: any) => {
                                   <p key={cat.id}>{cat.name}</p>
                                 ))}
                             </div>
-                            <div className="article__date">{post.date}</div>
+                            <div className="article__date">{formatDateInVNHomePage(post.date)}</div>
                           </div>
                           <div
                             dangerouslySetInnerHTML={{ __html: post.excerpt }}
@@ -95,7 +97,7 @@ const Home: NextPageWithLayout = ({ allPosts: { nodes } }: any) => {
                           ></div>
                         </div>
                         <div className="article__see-more">
-                          <a href={post.slug} style={{ color: "#15AABF" }}>
+                          <a href={"post/" + post.slug} style={{ color: "#15AABF" }}>
                             Xem thêm <AiOutlineRight />
                           </a>
                         </div>
@@ -106,77 +108,13 @@ const Home: NextPageWithLayout = ({ allPosts: { nodes } }: any) => {
               </Grid.Col>
             </Grid>
             <Pagination
-              sx={{ justifyContent: "end", marginTop: 10 }}
+              sx={{ justifyContent: "flex-end", marginTop: 10 }}
               total={10}
             />
           </Grid.Col>
           <Grid.Col md={3}>
             <Group>
-              <Paper sx={{ backgroundColor: "#f1f1f1", maxHeight: "800px" }}>
-                <div className="side-news">
-                  <div className="side-news__header">Tin đọc nhiều</div>
-                  <div className="side-news__item">
-                    <img className="side-news__img" src="./images/aqua.webp" alt="side-img" />
-                    <div className="side-news__content">
-                      <div className="side-news__viewstat">
-                        <p>24.12.2022</p>
-                        <p>69420 xem</p>
-                      </div>
-                      <div className="side-news__title">
-                        Minato Aqua (湊あくあ)
-                      </div>
-                    </div>
-                  </div>
-                  <div className="side-news__item">
-                    <img
-                      className="side-news__img"
-                      src="./images/shion.webp"
-                      alt="side-img"
-                    />
-                    <div className="side-news__content">
-                      <div className="side-news__viewstat">
-                        <p>24.12.2022</p>
-                        <p>69420 xem</p>
-                      </div>
-                      <div className="side-news__title">
-                        Murasaki Shion (紫咲シオン)
-                      </div>
-                    </div>
-                  </div>
-                  <div className="side-news__item">
-                    <img
-                      className="side-news__img"
-                      src="./images/choco.webp"
-                      alt="side-img"
-                    />
-                    <div className="side-news__content">
-                      <div className="side-news__viewstat">
-                        <p>24.12.2022</p>
-                        <p>69420 xem</p>
-                      </div>
-                      <div className="side-news__title">
-                        Yuzuki Choco (癒月ちょこ)
-                      </div>
-                    </div>
-                  </div>
-                  <div className="side-news__item">
-                    <img
-                      className="side-news__img"
-                      src="./images/chuba.webp"
-                      alt="side-img"
-                    />
-                    <div className="side-news__content">
-                      <div className="side-news__viewstat">
-                        <p>24.12.2022</p>
-                        <p>69420 xem</p>
-                      </div>
-                      <div className="side-news__title">
-                        Oozora Subaru (大空スバル)
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Paper>
+              <SideTabs/>
               <Paper
                 sx={{
                   backgroundColor: "#f1f1f1",

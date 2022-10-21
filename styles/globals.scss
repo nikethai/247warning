@@ -138,7 +138,7 @@ body {
           font-size: 16px;
           font-weight: 600;
           color: #000;
-          margin-top: 5px;
+          margin-top: 0px;
           margin-bottom: 5px;
         }
         .article__cat {
@@ -170,8 +170,7 @@ body {
         }
         .article__text {
           font-size: 14px;
-          font-weight: 500;
-          color: #000;
+          font-weight: 300;
           display: -webkit-box;
           -webkit-line-clamp: 5;
           -webkit-box-orient: vertical;
@@ -254,6 +253,11 @@ figcaption {
 }
 
 .mantine-InputWrapper-label.mantine-RadioGroup-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.mantine-Tabs-tabLabel{
   font-size: 15px;
   font-weight: 600;
 }

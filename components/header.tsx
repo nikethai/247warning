@@ -119,7 +119,7 @@ export function CustomHeader({ links }: CustomHeaderProps) {
     <Container fluid>
       {/* <Header height={56} mb={60}> */}
       <Container fluid className={classes.inner}>
-        <img src="./images/icon.png" alt="logo" width={40} />
+        <img src="/247logo.png" alt="logo" width={100} />
 
         <Group spacing={0} className={classes.social} position="right" noWrap>
           <ActionIcon size="lg">
