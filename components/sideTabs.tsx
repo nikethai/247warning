@@ -1,10 +1,13 @@
-import { Tabs } from "@mantine/core";
+import { Sx, Tabs } from "@mantine/core";
 import { FC } from "react";
 import SideNews from "./sideNews";
 
-const SideTabs: FC = () => {
+interface ISideTabs{
+  sx?: Sx | (Sx | undefined)[];
+}
+const SideTabs: FC<ISideTabs> = (props) => {
   return (
-    <Tabs defaultValue="mostView" variant="outline" radius="md">
+    <Tabs sx={props.sx} defaultValue="mostView" variant="outline" radius="md">
       <Tabs.List>
         <Tabs.Tab value="mostView">Tin đọc nhiều</Tabs.Tab>
         <Tabs.Tab value="mostCmt">Tin bình luận nhiều</Tabs.Tab>

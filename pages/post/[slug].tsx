@@ -10,11 +10,13 @@ import {
   Paper,
   Space,
   Text,
+  Textarea,
 } from "@mantine/core";
 import { GetServerSideProps, GetStaticPaths } from "next";
 
 import MainLayout from "../../components/layout";
 import SideNews from "../../components/sideNews";
+import SideTabs from "../../components/sideTabs";
 import { getAllPostsWithSlug, getPostDetail } from "../../lib/apiClient";
 import { formatDateInVN } from "../../lib/util";
 
@@ -44,6 +46,12 @@ export default function BlogPost({ post }: any) {
             <Divider />
             <Container>
               <h3>Bình luận</h3>
+              <Textarea
+                placeholder="Nhập ý kiến của bạn"
+                rows={5}
+                required
+              />
+              <Space h="md"/>
               <Paper radius="md" withBorder sx={{ padding: "10px 15px" }}>
                 <Group>
                   <Avatar
@@ -65,7 +73,7 @@ export default function BlogPost({ post }: any) {
                   Ara ara
                 </Text>
               </Paper>
-              <Space h="xl"/>
+              <Space h="xl" />
               <Paper radius="md" withBorder sx={{ padding: "10px 15px" }}>
                 <Group>
                   <Avatar
@@ -91,10 +99,15 @@ export default function BlogPost({ post }: any) {
             {/* <Divider sx={{ margin: "18px 0px" }} /> */}
           </Grid.Col>
           <Grid.Col md={3}>
-            <Group sx={{top: 0, position: "sticky"}}>
-              <SideNews showtitle />
+            <Group sx={{ top: 0, position: "sticky" }}>
+              {/* <SideNews showtitle /> */}
+              <SideTabs sx={{ marginTop: 10 }} />
               <Paper
-                sx={{ backgroundColor: "#f1f1f1", maxHeight: "800px", flex: "1 !important" }}
+                sx={{
+                  backgroundColor: "#f1f1f1",
+                  maxHeight: "800px",
+                  flex: "1 !important",
+                }}
               >
                 <div className="side-news">
                   <div className="side-news__header">Thẻ bài viết</div>
