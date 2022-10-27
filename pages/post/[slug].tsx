@@ -149,6 +149,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   return {
     paths: allPosts?.nodes.map((post) => `/post/${post.slug}`) || [],
-    fallback: true,
+    fallback: false,
   };
 };
