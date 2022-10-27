@@ -13,12 +13,13 @@ import {
   Textarea,
 } from "@mantine/core";
 import { GetServerSideProps, GetStaticPaths } from "next";
+import { Fragment } from "react";
 
 import MainLayout from "../../components/layout";
 import SideNews from "../../components/sideNews";
 import SideTabs from "../../components/sideTabs";
 import { getAllPostsWithSlug, getPostDetail } from "../../lib/apiClient";
-import { formatDateInVN } from "../../lib/util";
+import { formatDateInVN, fromDateToNow } from "../../lib/util";
 
 //TODO: Add type for post
 export default function BlogPost({ post }: any) {
@@ -51,57 +52,41 @@ export default function BlogPost({ post }: any) {
                 rows={5}
                 required
               />
-              <Space h="md"/>
-              <Paper radius="md" withBorder sx={{ padding: "10px 15px" }}>
-                <Group>
-                  <Avatar
-                    src="/images/choco.webp"
-                    alt="avat"
-                    radius="xl"
-                    size="lg"
-                  />
-                  <div>
-                    <Text size="sm" weight="bold">
-                      Choco-sen
-                    </Text>
-                    <Text size="xs" color="dimmed">
-                      1000 years ago
-                    </Text>
-                  </div>
-                </Group>
-                <Text sx={{ paddingLeft: 72 }} size="sm">
-                  Ara ara
-                </Text>
-              </Paper>
               <Space h="xl" />
-              <Paper radius="md" withBorder sx={{ padding: "10px 15px" }}>
-                <Group>
-                  <Avatar
-                    src="/images/shion.webp"
-                    alt="avat"
-                    radius="xl"
-                    size="lg"
-                  />
-                  <div>
-                    <Text size="sm" weight="bold">
-                      Shion
-                    </Text>
-                    <Text size="xs" color="dimmed">
-                      1000 years ago
-                    </Text>
-                  </div>
-                </Group>
-                <Text sx={{ paddingLeft: 72 }} size="sm">
-                  NEEEEEEEEEE!
-                </Text>
-              </Paper>
+              {post.comments ?
+                post.comments.nodes.map((cmt) => (
+                  <Fragment key={cmt.id}>
+                    <Paper radius="md" withBorder sx={{ padding: "10px 15px" }}>
+                      <Group>
+                        <Avatar
+                          src={cmt.author.node.avatar.url}
+                          alt="avat"
+                          radius="xl"
+                          size="lg"
+                        />
+                        <div>
+                          <Text size="sm" weight="bold">
+                            {cmt.author.node.name}
+                          </Text>
+                          <Text size="xs" color="dimmed">
+                            {fromDateToNow(cmt.date)}
+                          </Text>
+                        </div>
+                      </Group>
+                      <Text sx={{ paddingLeft: 72 }} size="sm" dangerouslySetInnerHTML={{ __html: cmt.content }}>
+                      </Text>
+                    </Paper>
+                    <Space h="md" />
+                  </Fragment>))
+                :
+                <></>}
             </Container>
             {/* <Divider sx={{ margin: "18px 0px" }} /> */}
           </Grid.Col>
           <Grid.Col md={3}>
             <Group sx={{ top: 0, position: "sticky" }}>
               {/* <SideNews showtitle /> */}
-              <SideTabs sx={{ marginTop: 10 }} />
+              <SideTabs secondTabsName="Tin liên quan" sx={{ marginTop: 10 }} />
               <Paper
                 sx={{
                   backgroundColor: "#f1f1f1",

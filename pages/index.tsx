@@ -1,26 +1,44 @@
 import React from 'react';
 import {
+  ActionIcon,
   Button,
   Container,
   Grid,
   Group,
-  Pagination,
   Paper,
   Radio,
 } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
 import { AiOutlineRight } from "@react-icons/all-files/ai/AiOutlineRight";
+import { AiFillCaretLeft } from "@react-icons/all-files/ai/AiFillCaretLeft";
+import { AiFillCaretRight } from "@react-icons/all-files/ai/AiFillCaretRight";
 import Autoplay from "embla-carousel-autoplay";
 
 import MainLayout from '../components/layout'
 import { NextPageWithLayout } from './_app'
 import HeroNews from '../components/heroNews';
-import { getAllPostsForHome } from '../lib/apiClient';
+import { getAllPostsForHome, getAllPostsPagination } from '../lib/apiClient';
 import { formatDateInVNHomePage } from '../lib/util';
 import SideTabs from '../components/sideTabs';
+import { TOTAL_POSTS_PER_PAGE } from '../lib/constant';
 
-const Home: NextPageWithLayout = ({ allPosts: { nodes } }: any) => {
+const Home: NextPageWithLayout = ({ ap: { edges, pageInfo } }: any) => {
+  const [refEdges, setRefEdges] = React.useState(edges);
+  const [refPageInfo, setRefPageInfo] = React.useState(pageInfo);
   const autoplay = React.useRef(Autoplay({ delay: 6000 }));
+
+
+  const getNextPage = async () => {
+    const nextPosts = await getAllPostsPagination(TOTAL_POSTS_PER_PAGE, null, refPageInfo.endCursor);
+    setRefEdges(nextPosts.edges);
+    setRefPageInfo(nextPosts.pageInfo);
+  }
+
+  const getPrevPage = async () => {
+    const prevPosts = await getAllPostsPagination(null, TOTAL_POSTS_PER_PAGE, null, refPageInfo.startCursor);
+    setRefEdges(prevPosts.edges);
+    setRefPageInfo(prevPosts.pageInfo);
+  }
 
   return (
     <>
@@ -70,8 +88,9 @@ const Home: NextPageWithLayout = ({ allPosts: { nodes } }: any) => {
               </Grid.Col>
               <Grid.Col>
                 <div className="article__col">
-                  {nodes.map((post: any) => (
-                    <div key={post.id} className="article">
+                  {refEdges.map((n: any) => {
+                    const post = n.node;
+                    return <div key={post.id} className="article">
                       <div className="article__img_col">
                         <img
                           className="article__img"
@@ -103,18 +122,22 @@ const Home: NextPageWithLayout = ({ allPosts: { nodes } }: any) => {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  })}
                 </div>
               </Grid.Col>
             </Grid>
-            <Pagination
-              sx={{ justifyContent: "flex-end", marginTop: 10 }}
-              total={10}
-            />
+            <Group sx={{ justifyContent: "flex-end", marginTop: 10 }}>
+              <ActionIcon onClick={getPrevPage} variant='outline' disabled={!refPageInfo.hasPreviousPage}>
+                <AiFillCaretLeft />
+              </ActionIcon>
+              <ActionIcon onClick={getNextPage} variant='outline' disabled={!refPageInfo.hasNextPage}>
+                <AiFillCaretRight />
+              </ActionIcon>
+            </Group>
           </Grid.Col>
           <Grid.Col md={3}>
             <Group>
-              <SideTabs/>
+              <SideTabs />
               <Paper
                 sx={{
                   backgroundColor: "#f1f1f1",
@@ -193,9 +216,10 @@ Home.getLayout = (page) => {
 export default Home
 
 export const getStaticProps = async () => {
-  const allPosts = await getAllPostsForHome();
+  const ap = await getAllPostsPagination(TOTAL_POSTS_PER_PAGE);
+
   return {
-    props: { allPosts },
+    props: { ap },
     revalidate: 10,
   }
 }

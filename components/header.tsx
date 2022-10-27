@@ -106,8 +106,7 @@ export function CustomHeader({ links }: CustomHeaderProps) {
       className={cx(classes.link, {
         [classes.linkActive]: active === link.link,
       })}
-      onClick={(event) => {
-        // event.preventDefault();
+      onClick={(event) => { 
         setActive(link.link);
       }}
     >

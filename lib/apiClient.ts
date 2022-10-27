@@ -61,6 +61,58 @@ export async function getAllPostsWithSlug() {
   return data?.posts;
 }
 
+export async function getAllPostsPagination(
+  first: number,
+  last?: number,
+  after?: string,
+  before?: string
+) {
+  const data = await fetchAPI(
+    `
+  query AllPosts($first: Int, $last: Int, $after: String, $before: String)
+  {
+      posts(first: $first, last: $last, after: $after, before: $before, where: { orderby: { field: DATE, order: DESC } }) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+        edges {
+          cursor
+          node {
+            id
+            title
+            excerpt
+            slug
+            date
+            featuredImage {
+              node {
+                mediaItemUrl
+              }
+            }
+            author {
+              node {
+                name
+              }
+            }
+            categories {
+                nodes {
+                  id
+                  name
+                  uri
+                }
+            }
+          }
+        }
+      }
+    }
+  `,
+    { variables: { first, last, after, before } }
+  );
+  return data?.posts;
+}
+
 export async function getAllPostsForHome(preview: boolean = false) {
   const data = await fetchAPI(
     `
@@ -237,6 +289,21 @@ export async function getPostDetail(slug: string) {
           }
         }
         date
+        comments {
+          nodes {
+            id
+            content
+            author {
+              node {
+                avatar {
+                  url
+                }
+                name
+              }
+            }
+            date
+          }
+        }
       }
     }`,
     {
