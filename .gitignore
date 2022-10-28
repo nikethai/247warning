@@ -37,3 +37,4 @@ next-env.d.ts
 
 # Google Analytics
 scamwarn-ga4.json
+.env
