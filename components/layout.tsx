@@ -16,6 +16,7 @@ const MainLayout: React.FC<LayoutProps> = ({ children, post }) => {
     { link: "/n", label: "News" },
   ];
   const data = [{ title: "About", links }];
+
   return (
     <>
       <Head

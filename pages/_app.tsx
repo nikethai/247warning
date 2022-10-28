@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
 import { NextPage } from 'next';
 import { ReactElement, ReactNode } from 'react';
+import "../lib/firebase"
 import "../styles/globals.scss";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {

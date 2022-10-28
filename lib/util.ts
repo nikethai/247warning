@@ -12,6 +12,11 @@ export const formatDateInVNHomePage = (date) => {
   return dayjs(date).format("dddd, D/MM/YYYY");
 };
 
+export const formatDateInVNWithoutDay = (date) => {
+  dayjs.locale("vi");
+  return dayjs(date).format("D/MM/YYYY");
+};
+
 export const fromDateToNow = (date) => {
   dayjs.locale("vi");
   dayjs.extend(relativetime);

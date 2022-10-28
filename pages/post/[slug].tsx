@@ -20,12 +20,14 @@ import { Fragment } from "react";
 
 import MainLayout from "../../components/layout";
 import SideTabs from "../../components/sideTabs";
-import { getAllPostsWithSlug, getPostDetail } from "../../lib/apiClient";
+import { getAllPostsWithSlug, getPostDetail, getPostSummary } from "../../lib/apiClient";
 import { formatDateInVN, fromDateToNow } from "../../lib/util";
 import Loader from "../../components/loader";
+import { IMostViewPost } from "../../interface";
+import { getReportByPageViews } from "../../lib/analytics";
 
 //TODO: Add type for post
-export default function BlogPost({ post }: any) {
+export default function BlogPost({ post,mostViewPosts }: any) {
   const router = useRouter();
   const items = post?.categories?.nodes.reverse().map((cat, idx, arr) => {
     return (
@@ -96,7 +98,7 @@ export default function BlogPost({ post }: any) {
               <Grid.Col md={3}>
                 <Group sx={{ top: 0, position: "sticky" }}>
                   {/* <SideNews showtitle /> */}
-                  <SideTabs secondTabsName="Tin liên quan" sx={{ marginTop: 10 }} />
+                  <SideTabs mostViewData={mostViewPosts} secondTabsName="Tin liên quan" sx={{ marginTop: 10 }} />
                   <Paper
                     sx={{
                       backgroundColor: "#f1f1f1",
@@ -145,11 +147,18 @@ export default function BlogPost({ post }: any) {
 
 export const getStaticProps: GetServerSideProps = async ({ params }) => {
   const data = await getPostDetail(params.slug as string);
+  const mostViewSlug = await getReportByPageViews();
+  const mostViewPosts: IMostViewPost[] = await Promise.all(
+    mostViewSlug.map(async info => {
+      const post = await getPostSummary(info.pagePath);
+      return { postContent: post, postView: info.pageView }
+    })
+  );
 
   return {
     props: {
       post: data.post,
-      //   posts: data.posts,
+      mostViewPosts,
     },
     revalidate: 10,
   };

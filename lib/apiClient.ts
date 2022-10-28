@@ -4,6 +4,7 @@ const API_URL =
 interface IHeaders {
   [key: string]: string;
 }
+
 async function fetchAPI(query = "", { variables }: Record<string, any> = {}) {
   const headers: IHeaders = { "Content-Type": "application/json" };
 
@@ -154,6 +155,32 @@ export async function getAllPostsForHome(preview: boolean = false) {
   );
 
   return data?.posts;
+}
+
+export async function getPostSummary(slug: string) {
+  const data = await fetchAPI(
+    `query PostBySlugSum($id: ID!, $idType: PostIdType!) {
+        post(id: $id, idType: $idType) {
+            id
+            title
+            excerpt
+            slug
+            date
+            featuredImage {
+              node {
+                mediaItemUrl
+              }
+            }
+        }
+      }`,
+    {
+      variables: {
+        id: slug,
+        idType: "SLUG",
+      },
+    }
+  );
+  return data;
 }
 
 export async function getPostAndMorePosts(
