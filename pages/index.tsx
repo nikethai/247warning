@@ -17,18 +17,19 @@ import Autoplay from "embla-carousel-autoplay";
 import MainLayout from '../components/layout'
 import { NextPageWithLayout } from './_app'
 import HeroNews from '../components/heroNews';
-import { getAllPostsForHome, getAllPostsPagination, getPostSummary } from '../lib/apiClient';
+import { getAllPostsForHome, getAllPostsPagination, getPolls, getPostSummary } from '../lib/apiClient';
 import { formatDateInVNHomePage } from '../lib/util';
 import SideTabs from '../components/sideTabs';
 import { TOTAL_POSTS_PER_PAGE } from '../lib/constant';
 import { getReportByPageViews } from "../lib/analytics";
-import { IMostViewPost } from '../interface';
+import { IMostViewPost, IPoll } from '../interface';
 
 interface IProps {
     ap: any;
     mostViewPosts: IMostViewPost[];
+    polls: IPoll[];
 }
-const Home: NextPageWithLayout<IProps> = ({ ap: { edges, pageInfo }, mostViewPosts }) => {
+const Home: NextPageWithLayout<IProps> = ({ ap: { edges, pageInfo }, mostViewPosts, polls }) => {
     const [refEdges, setRefEdges] = React.useState(edges);
     const [refPageInfo, setRefPageInfo] = React.useState(pageInfo);
     const autoplay = React.useRef(Autoplay({ delay: 6000 }));
@@ -144,31 +145,38 @@ const Home: NextPageWithLayout<IProps> = ({ ap: { edges, pageInfo }, mostViewPos
                     </Grid.Col>
                     <Grid.Col md={3}>
                         <Group>
-                            <SideTabs mostViewData={mostViewPosts}/>
-                            <Paper
-                                sx={{
-                                    backgroundColor: "#f1f1f1",
-                                    maxHeight: "800px",
-                                    minWidth: "100%",
-                                }}
-                            >
-                                <div className="side-news">
-                                    <div className="side-news__header">Khảo sát</div>
-                                    <Radio.Group
-                                        sx={{ padding: 7 }}
-                                        name="favMember"
-                                        orientation="vertical"
-                                        label="Who is your favorite hololive member?"
-                                    >
-                                        <Radio value="aqua" label="Minato Aqua" />
-                                        <Radio value="shion" label="Murasaki Shion" />
-                                        <Radio value="choco" label="Yuzuki Choco" />
-                                        <Radio value="subaru" label="Oozora Subaru" />
-                                        <Radio value="ayame" label="Nakiri Ayame" />
-                                    </Radio.Group>
-                                    <Button color="cyan">Submit</Button>
-                                </div>
-                            </Paper>
+                            {/* WTF React */}
+                            <>
+                                {/* <SideTabs mostViewData={mostViewPosts} /> */}
+                                {polls.map((poll) => {
+                                    return poll.open && (
+                                        <Paper
+                                            sx={{
+                                                backgroundColor: "#f1f1f1",
+                                                maxHeight: "800px",
+                                                minWidth: "100%",
+                                            }}
+                                        >
+                                            <div className="side-news">
+                                                <div className="side-news__header">Khảo sát</div>
+                                                <Radio.Group
+                                                    key={poll.id}
+                                                    sx={{ padding: 7 }}
+                                                    name={poll.question}
+                                                    orientation="vertical"
+                                                    label={poll.question}
+                                                >
+                                                    {poll.answers.map((answer) => (
+                                                        <Radio key={answer.id} value={answer.id.toString()} label={answer.description} />
+                                                    ))}
+                                                </Radio.Group>
+                                                <Button color="cyan">Submit</Button>
+                                            </div>
+                                        </Paper>
+                                    )
+                                })}
+
+                            </>
                         </Group>
                     </Grid.Col>{" "}
                 </Grid>
@@ -231,9 +239,12 @@ export const getStaticProps = async () => {
             return { postContent: post, postView: info.pageView }
         })
     );
+    const pollsResp = await getPolls();
+    const polls = pollsResp.polls;
+
 
     return {
-        props: { ap, mostViewPosts },
+        props: { ap, mostViewPosts, polls },
         revalidate: 10,
     }
 }

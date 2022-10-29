@@ -342,3 +342,24 @@ export async function getPostDetail(slug: string) {
   );
   return data;
 }
+
+export async function getPolls() {
+  const data = await fetchAPI(
+    `query AllPolls{
+      polls {
+        id
+        question
+        totalVotes
+        open
+        maxAnswers
+        voted
+        answers {
+          id
+          description
+          votes
+        }
+      }
+    }`,
+  );
+  return data;
+}
