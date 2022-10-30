@@ -6,7 +6,7 @@ const analyticsDataClient = new BetaAnalyticsDataClient({
     client_email: process.env.GOOGLE_CLIENT_EMAIL,
     private_key: process.env.GOOGLE_PRIVATE_KEY,
     client_id: process.env.GOOGLE_CLIENT_ID,
-  }
+  },
 });
 const getReportByPageViews = async (): Promise<IMostViewData[]> => {
   const [resp] = await analyticsDataClient.runReport({
@@ -19,15 +19,20 @@ const getReportByPageViews = async (): Promise<IMostViewData[]> => {
     ],
     dimensions: [{ name: "pagePath" }],
     metrics: [{ name: "screenPageViews" }],
+    limit: 5
   });
 
   return resp.rows
     .map((r) => {
-      const pagePath = r.dimensionValues[0];
+      const pagePathStripped = r.dimensionValues[0].value.match(
+        /(?:^|\W)\b(?!post\b)[^/]*/g
+      );
       const pageView = r.metricValues[0];
-      return { pagePath: pagePath.value, pageView: pageView.value };
+      const pagePath = pagePathStripped ? pagePathStripped[0] : "/";
+      return { pagePath: pagePath, pageView: pageView.value };
     })
-    .filter((v) => v.pagePath != "/");
+    .filter((v) => v.pagePath != "/")
+    .filter((v, i, a) => a.findIndex((v2) => v2.pagePath === v.pagePath) === i);
 };
 
 export { getReportByPageViews };
