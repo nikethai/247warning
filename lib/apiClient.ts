@@ -156,6 +156,32 @@ export async function getAllPostsForHome(preview: boolean = false) {
 
   return data?.posts;
 }
+export async function getAllFeaturePost() {
+  const data = await fetchAPI(
+    `
+    query AllPosts {
+      posts(where: {categoryName: "Nổi bật", orderby: { field: DATE, order: DESC } }) {
+          nodes {
+            id
+            title
+            slug
+            date
+            featuredImage {
+              node {
+                mediaItemUrl
+              }
+            }
+          }
+      }
+    }
+  `,
+    {
+      variables: {},
+    }
+  );
+
+  return data?.posts;
+}
 
 export async function getPostSummary(slug: string) {
   const data = await fetchAPI(
@@ -359,7 +385,7 @@ export async function getPolls() {
           votes
         }
       }
-    }`,
+    }`
   );
   return data;
 }

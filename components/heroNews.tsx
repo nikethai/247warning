@@ -1,8 +1,15 @@
 import { Grid } from "@mantine/core";
 import * as React from "react";
 
-// TODO: Change any to proper type
-export default function HeroNews({ heroImg, heroText, heroStat }: any) {
+interface IProps{
+    heroImg: string;
+    heroText: string;
+    heroStats: {
+        date: string;
+        views?: number;
+    };
+}
+export default function HeroNews({ heroImg, heroText, heroStats }: IProps) {
     return (
         <div
             style={{ backgroundImage: `url(${heroImg})` }}
@@ -17,8 +24,8 @@ export default function HeroNews({ heroImg, heroText, heroStat }: any) {
                         </p>
                     </Grid.Col>
                     <Grid.Col className="hero__viewstat" md={3}>
-                        <p>24.12.2022</p>
-                        <p>69420 xem</p>
+                        <p>{heroStats.date}</p>
+                        {/* <p>69420 xem</p> */}
                     </Grid.Col>
                 </Grid>
             </div>

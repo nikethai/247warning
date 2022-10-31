@@ -18,40 +18,35 @@ import MainLayout from "../components/layout";
 import { NextPageWithLayout } from "./_app";
 import HeroNews from "../components/heroNews";
 import {
-  getAllPostsForHome,
+  getAllFeaturePost,
   getAllPostsPagination,
   getPolls,
   getPostSummary,
 } from "../lib/apiClient";
-import { formatDateInVNHomePage } from "../lib/util";
+import { formatDateInVNHomePage, formatDateInVNWithoutDay } from "../lib/util";
 import SideTabs from "../components/sideTabs";
 import { TOTAL_POSTS_PER_PAGE } from "../lib/constant";
 import { getReportByPageViews } from "../lib/analytics";
 import { IMostViewPost, IPoll } from "../interface";
 
 interface IProps {
-  ap: any;
+  edges: any;
+  featurePosts: any;
+  pageInfo: any;
   mostViewPosts: IMostViewPost[];
   polls: IPoll[];
 }
 const Home: NextPageWithLayout<IProps> = ({
-  ap: { edges, pageInfo },
+  edges,
+  featurePosts,
+  pageInfo,
   mostViewPosts,
   polls,
 }) => {
   const [refEdges, setRefEdges] = React.useState(edges);
   const [refPageInfo, setRefPageInfo] = React.useState(pageInfo);
-  const autoplay = React.useRef(Autoplay({ delay: 6000 }));
 
-  React.useEffect(() => {
-    setRefEdges((prevEdges) =>
-      prevEdges.filter((post) =>
-        !post.node.categories.nodes.some((cat) => {
-          return cat.id == "dGVybTo0OQ==";
-        })
-      )
-    );
-  }, []);
+  const autoplay = React.useRef(Autoplay({ delay: 6000 }));
 
   const getNextPage = async () => {
     const nextPosts = await getAllPostsPagination(
@@ -87,37 +82,19 @@ const Home: NextPageWithLayout<IProps> = ({
                   onMouseEnter={autoplay.current.stop}
                   onMouseLeave={autoplay.current.reset}
                 >
-                  <Carousel.Slide>
-                    <HeroNews
-                      heroImg="/images/n-a.jpeg"
-                      heroText=" Nakiri Ayame (百鬼あやめ) is a female Japanese Virtual
-                            YouTuber associated with hololive, debuting as part of
-                            its second generation of VTubers alongside Minato
-                            Aqua, Murasaki Shion, Yuzuki Choco and Oozora Subaru."
-                      heroStat=""
-                    />
-                  </Carousel.Slide>
-                  <Carousel.Slide>
-                    <HeroNews
-                      heroImg="/images/m-a.jpg"
-                      heroText="Minato Aqua (湊あくあ) is a female Japanese Virtual YouTuber associated with hololive, debuting as part of its second generation of VTubers alongside Murasaki Shion, Nakiri Ayame, Yuzuki Choco and Oozora Subaru."
-                      heroStat=""
-                    />
-                  </Carousel.Slide>
-                  <Carousel.Slide>
-                    <HeroNews
-                      heroImg="/images/m-s.jpg"
-                      heroText="Murasaki Shion (紫咲シオン) is a female Japanese Virtual YouTuber associated with hololive, debuting as part of its second generation of VTubers alongside Minato Aqua, Nakiri Ayame, Yuzuki Choco and Oozora Subaru."
-                      heroStat=""
-                    />
-                  </Carousel.Slide>
-                  <Carousel.Slide>
-                    <HeroNews
-                      heroImg="/images/gen2.jpg"
-                      heroText="Hololive Gen 2 (ホロライブ第二期) is the second generation of VTubers associated with hololive, debuting on 2020-07-03. The group consists of Minato Aqua, Murasaki Shion, Nakiri Ayame, Yuzuki Choco and Oozora Subaru."
-                      heroStat=""
-                    />
-                  </Carousel.Slide>
+                  {featurePosts.nodes.map((post: any) => (
+                    <Carousel.Slide key={post.id}>
+                      <HeroNews
+                        heroImg={
+                          post.featuredImage?.node.mediaItemUrl ?? ""
+                        }
+                        heroText={post.title}
+                        heroStats={{
+                          date: formatDateInVNWithoutDay(post.date),
+                        }}
+                      />
+                    </Carousel.Slide>
+                  ))}
                 </Carousel>
               </Grid.Col>
               <Grid.Col>
@@ -272,6 +249,7 @@ export default Home;
 
 export const getStaticProps = async () => {
   const ap = await getAllPostsPagination(TOTAL_POSTS_PER_PAGE);
+  const featurePosts = await getAllFeaturePost();
   const mostViewSlug = await getReportByPageViews();
   const mostViewPosts: IMostViewPost[] = await Promise.all(
     mostViewSlug.map(async (info) => {
@@ -282,8 +260,10 @@ export const getStaticProps = async () => {
   const pollsResp = await getPolls();
   const polls = pollsResp.polls;
 
+  const { edges, pageInfo } = ap;
+
   return {
-    props: { ap, mostViewPosts, polls },
+    props: { edges, featurePosts, pageInfo, mostViewPosts, polls },
     revalidate: 10,
   };
 };
