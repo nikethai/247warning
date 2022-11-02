@@ -389,3 +389,31 @@ export async function getPolls() {
   );
   return data;
 }
+
+export async function getAllPostsByComments() {
+  const data = await fetchAPI(
+    `
+    query AllPosts {
+      posts(first: 4, where: {orderby: {field: COMMENT_COUNT, order: DESC}}) {
+    nodes {
+      id
+      title
+      excerpt
+      slug
+      date
+      featuredImage {
+        node {
+          mediaItemUrl
+        }
+      }
+      commentCount
+    }
+  }
+    }
+  `,
+    {
+      variables: {},
+    }
+  );
+  return data;
+}

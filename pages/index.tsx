@@ -19,6 +19,7 @@ import { NextPageWithLayout } from "./_app";
 import HeroNews from "../components/heroNews";
 import {
   getAllFeaturePost,
+  getAllPostsByComments,
   getAllPostsPagination,
   getPolls,
   getPostSummary,
@@ -34,6 +35,7 @@ interface IProps {
   featurePosts: any;
   pageInfo: any;
   mostViewPosts: IMostViewPost[];
+  mostCommentsPosts: any;
   polls: IPoll[];
 }
 const Home: NextPageWithLayout<IProps> = ({
@@ -41,6 +43,7 @@ const Home: NextPageWithLayout<IProps> = ({
   featurePosts,
   pageInfo,
   mostViewPosts,
+  mostCommentsPosts: { posts },
   polls,
 }) => {
   const [refEdges, setRefEdges] = React.useState(edges);
@@ -85,9 +88,7 @@ const Home: NextPageWithLayout<IProps> = ({
                   {featurePosts.nodes.map((post: any) => (
                     <Carousel.Slide key={post.id}>
                       <HeroNews
-                        heroImg={
-                          post.featuredImage?.node.mediaItemUrl ?? ""
-                        }
+                        heroImg={post.featuredImage?.node.mediaItemUrl ?? ""}
                         heroText={post.title}
                         heroStats={{
                           date: formatDateInVNWithoutDay(post.date),
@@ -164,7 +165,7 @@ const Home: NextPageWithLayout<IProps> = ({
           <Grid.Col md={3}>
             <Group>
               {/* WTF React */}
-              <SideTabs mostViewData={mostViewPosts} />
+              <SideTabs secondTabsData={posts} mostViewData={mostViewPosts} />
               {polls.map((poll) => {
                 return (
                   poll.open && (
@@ -250,6 +251,7 @@ export default Home;
 export const getStaticProps = async () => {
   const ap = await getAllPostsPagination(TOTAL_POSTS_PER_PAGE);
   const featurePosts = await getAllFeaturePost();
+  const mostCommentsPosts = await getAllPostsByComments();
   const mostViewSlug = await getReportByPageViews();
   const mostViewPosts: IMostViewPost[] = await Promise.all(
     mostViewSlug.map(async (info) => {
@@ -263,7 +265,14 @@ export const getStaticProps = async () => {
   const { edges, pageInfo } = ap;
 
   return {
-    props: { edges, featurePosts, pageInfo, mostViewPosts, polls },
+    props: {
+      edges,
+      featurePosts,
+      pageInfo,
+      mostViewPosts,
+      mostCommentsPosts,
+      polls,
+    },
     revalidate: 10,
   };
 };

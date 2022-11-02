@@ -23,3 +23,19 @@ export interface IPoll {
   voted: boolean;
   answers: IAnswer[];
 }
+
+export interface FeaturedImage {
+  node: {
+    mediaItemUrl: string;
+  };
+}
+
+export interface IMostComments {
+  id: string;
+  title: string;
+  excerpt: string;
+  slug: string;
+  date: Date;
+  featuredImage: FeaturedImage;
+  commentCount: number;
+}
