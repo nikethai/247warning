@@ -1,19 +1,19 @@
-import { AppProps } from 'next/app';
-import Head from 'next/head';
-import { MantineProvider } from '@mantine/core';
-import { NextPage } from 'next';
-import { ReactElement, ReactNode } from 'react';
-import "../lib/firebase"
+import { AppProps } from "next/app";
+import Head from "next/head";
+import { MantineProvider } from "@mantine/core";
+import { NextPage } from "next";
+import { ReactElement, ReactNode } from "react";
+import "../lib/firebase";
 import "../styles/globals.scss";
+import { NotificationsProvider } from "@mantine/notifications";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: ReactElement) => ReactNode
-}
+  getLayout?: (page: ReactElement) => ReactNode;
+};
 
 type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout
-}
-
+  Component: NextPageWithLayout;
+};
 
 export default function App(props: AppPropsWithLayout) {
   const { Component, pageProps } = props;
@@ -25,10 +25,12 @@ export default function App(props: AppPropsWithLayout) {
         withCSSVariables
         theme={{
           /** Put your mantine theme override here */
-          colorScheme: 'light',
+          colorScheme: "light",
         }}
       >
-        <Component {...pageProps} />
+        <NotificationsProvider position="top-right">
+          <Component {...pageProps} />
+        </NotificationsProvider>
       </MantineProvider>
     </>
   );

@@ -3,6 +3,7 @@ import {
   Avatar,
   Badge,
   Breadcrumbs,
+  Button,
   Container,
   Divider,
   Grid,
@@ -12,23 +13,33 @@ import {
   Space,
   Text,
   Textarea,
+  TextInput,
 } from "@mantine/core";
 import { GetServerSideProps, GetStaticPaths } from "next";
 import { useRouter } from "next/router";
 import ErrorPage from "next/error";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 
 import MainLayout from "../../components/layout";
 import SideTabs from "../../components/sideTabs";
-import { getAllPostsWithSlug, getPostDetail, getPostSummary } from "../../lib/apiClient";
+import {
+  createComment,
+  getAllPostsWithSlug,
+  getPostDetail,
+  getPostSummary,
+} from "../../lib/apiClient";
 import { formatDateInVN, fromDateToNow } from "../../lib/util";
 import Loader from "../../components/loader";
 import { IMostViewPost } from "../../interface";
 import { getReportByPageViews } from "../../lib/analytics";
+import { useForm } from "@mantine/form";
+import { showNotification } from "@mantine/notifications";
 
 //TODO: Add type for post
-export default function BlogPost({ post,mostViewPosts }: any) {
+export default function BlogPost({ post, mostViewPosts }: any) {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   const items = post?.categories?.nodes.reverse().map((cat, idx, arr) => {
     return (
       <Anchor key={cat.id} href={cat.link}>
@@ -38,14 +49,54 @@ export default function BlogPost({ post,mostViewPosts }: any) {
   });
 
   if (!router.isFallback && !post?.slug) {
-    return <ErrorPage statusCode={404} />
+    return <ErrorPage statusCode={404} />;
   }
+
+  const form = useForm({
+    initialValues: {
+      authorName: "",
+      content: "",
+    },
+  });
+
+  const commentSubmit = async (values) => {
+    setIsLoading(true);
+    if (!values.authorName || !values.content) return;
+
+    const resp = await createComment(
+      post.databaseId,
+      values.content,
+      values.authorName
+    );
+
+    if (resp.createComment && resp.createComment.success) {
+      showNotification({
+        id: "create-cmt",
+        title: "Đăng bình luận thành công",
+        message: "Bình luận của bạn sẽ được quản trị viên phê duyệt",
+        color: "teal",
+      });
+      setIsLoading(false);
+    } else {
+      showNotification({
+        id: "create-cmt",
+        title: "Đăng bình luận không thành công",
+        message: resp.errors[0].message,
+        color: "teal",
+      });
+      setIsLoading(false);
+    }
+
+    form.reset();
+  };
 
   return (
     <MainLayout post={post}>
       <Container size="xl">
         <Grid>
-          {router.isFallback ? <Loader /> :
+          {router.isFallback ? (
+            <Loader />
+          ) : (
             <>
               <Grid.Col md={9}>
                 <Container size="md">
@@ -59,16 +110,41 @@ export default function BlogPost({ post,mostViewPosts }: any) {
                 <Divider />
                 <Container>
                   <h3>Bình luận</h3>
-                  <Textarea
-                    placeholder="Nhập ý kiến của bạn"
-                    rows={5}
-                    required
-                  />
+                  <form onSubmit={form.onSubmit(commentSubmit)}>
+                    <TextInput
+                      placeholder="Tên của bạn"
+                      required
+                      disabled={isLoading}
+                      {...form.getInputProps("authorName")}
+                    />
+                    <Space h="sm" />
+                    <Textarea
+                      placeholder="Nhập ý kiến của bạn"
+                      rows={5}
+                      required
+                      disabled={isLoading}
+                      {...form.getInputProps("content")}
+                    />
+                    <Space h="sm" />
+                    <Button
+                      sx={{ float: "right" }}
+                      type="submit"
+                      color="cyan"
+                      variant="light"
+                      loading={isLoading}
+                    >
+                      Đăng bình luận
+                    </Button>
+                  </form>
                   <Space h="xl" />
-                  {post.comments ?
+                  {post.comments ? (
                     post.comments.nodes.map((cmt) => (
                       <Fragment key={cmt.id}>
-                        <Paper radius="md" withBorder sx={{ padding: "10px 15px" }}>
+                        <Paper
+                          radius="md"
+                          withBorder
+                          sx={{ padding: "10px 15px" }}
+                        >
                           <Group>
                             <Avatar
                               src={cmt.author.node.avatar.url}
@@ -85,20 +161,29 @@ export default function BlogPost({ post,mostViewPosts }: any) {
                               </Text>
                             </div>
                           </Group>
-                          <Text sx={{ paddingLeft: 72 }} size="sm" dangerouslySetInnerHTML={{ __html: cmt.content }}>
-                          </Text>
+                          <Text
+                            sx={{ paddingLeft: 72 }}
+                            size="sm"
+                            dangerouslySetInnerHTML={{ __html: cmt.content }}
+                          ></Text>
                         </Paper>
                         <Space h="md" />
-                      </Fragment>))
-                    :
-                    <></>}
+                      </Fragment>
+                    ))
+                  ) : (
+                    <></>
+                  )}
                 </Container>
                 {/* <Divider sx={{ margin: "18px 0px" }} /> */}
               </Grid.Col>
               <Grid.Col md={3}>
                 <Group sx={{ top: 0, position: "sticky" }}>
                   {/* <SideNews showtitle /> */}
-                  <SideTabs mostViewData={mostViewPosts} secondTabsName="Tin liên quan" sx={{ marginTop: 10 }} />
+                  <SideTabs
+                    mostViewData={mostViewPosts}
+                    secondTabsName="Tin liên quan"
+                    sx={{ marginTop: 10 }}
+                  />
                   <Paper
                     sx={{
                       backgroundColor: "#f1f1f1",
@@ -138,7 +223,8 @@ export default function BlogPost({ post,mostViewPosts }: any) {
                   </Paper>
                 </Group>
               </Grid.Col>
-            </>}
+            </>
+          )}
         </Grid>
       </Container>
     </MainLayout>
@@ -149,9 +235,9 @@ export const getStaticProps: GetServerSideProps = async ({ params }) => {
   const data = await getPostDetail(params.slug as string);
   const mostViewSlug = await getReportByPageViews();
   const mostViewPosts: IMostViewPost[] = await Promise.all(
-    mostViewSlug.map(async info => {
+    mostViewSlug.map(async (info) => {
       const post = await getPostSummary(info.pagePath);
-      return { postContent: post, postView: info.pageView }
+      return { postContent: post, postView: info.pageView };
     })
   );
 

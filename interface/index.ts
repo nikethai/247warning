@@ -30,7 +30,7 @@ export interface FeaturedImage {
   };
 }
 
-export interface IMostComments {
+export interface IComment {
   id: string;
   title: string;
   excerpt: string;
@@ -38,4 +38,8 @@ export interface IMostComments {
   date: Date;
   featuredImage: FeaturedImage;
   commentCount: number;
+}
+
+export interface IMostComments {
+  nodes: IComment[];
 }

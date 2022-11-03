@@ -7,7 +7,7 @@ import { formatDateInVNWithoutDay } from "../lib/util";
 interface ISideNews {
   showtitle?: boolean;
   isMostView: boolean;
-  data: IMostViewPost[] | IMostComments[];
+  data: IMostViewPost[] | IMostComments;
 }
 const SideNews: FC<ISideNews> = ({ showtitle = false, isMostView, data }) => {
   return (
@@ -15,7 +15,7 @@ const SideNews: FC<ISideNews> = ({ showtitle = false, isMostView, data }) => {
       <div className="side-news">
         {showtitle && <div className="side-news__header">Tin đọc nhiều</div>}
         {isMostView
-          ? data.map((item) => (
+          ? (data as IMostViewPost[]).map((item) => (
               <div key={item.postContent.post.id} className="side-news__item">
                 <img
                   className="side-news__img"
@@ -41,7 +41,7 @@ const SideNews: FC<ISideNews> = ({ showtitle = false, isMostView, data }) => {
                 </div>
               </div>
             ))
-          : data.nodes.map((item) => (
+          : (data as IMostComments).nodes.map((item) => (
               <div key={item.id} className="side-news__item">
                 <img
                   className="side-news__img"

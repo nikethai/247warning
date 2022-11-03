@@ -342,6 +342,7 @@ export async function getPostDetail(slug: string) {
           }
         }
         date
+        databaseId
         comments {
           nodes {
             id
@@ -413,6 +414,34 @@ export async function getAllPostsByComments() {
   `,
     {
       variables: {},
+    }
+  );
+  return data;
+}
+
+export async function createComment(
+  postId: Number,
+  content: String,
+  authorName: String
+) {
+  const data = await fetchAPI(
+    `
+      mutation CreateComment($postId: Int!, $content: String!, $authorName: String!){
+        createComment(input: {
+          commentOn: $postId,
+          content: $content,
+          author: $authorName
+        }){
+          success,
+        }
+      }
+    `,
+    {
+      variables: {
+        postId: postId,
+        content: content,
+        authorName: authorName,
+      },
     }
   );
   return data;
