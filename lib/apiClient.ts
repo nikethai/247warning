@@ -419,6 +419,38 @@ export async function getAllPostsByComments() {
   return data;
 }
 
+export async function votePoll(
+  pollId: Number,
+  clientId: String,
+  userId: Number = 3,
+  answers: String
+) {
+  const data = await fetchAPI(
+    `
+     mutation PollVote($id: Int, $clientId: String, $userId: Int, $answers: String) {
+      vote(input: {
+        clientMutationId: $clientId,
+        id: $id,
+        userId: $userId,
+        answers: $answers
+      }) {
+        status
+        message
+      }
+    }
+    `,
+    {
+      variables: {
+        id: pollId,
+        clientId: clientId,
+        userId: userId,
+        answers: answers
+      },
+    }
+  );
+  return data;
+}
+
 export async function createComment(
   postId: Number,
   content: String,

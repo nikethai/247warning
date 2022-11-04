@@ -48,10 +48,6 @@ export default function BlogPost({ post, mostViewPosts }: any) {
     );
   });
 
-  if (!router.isFallback && !post?.slug) {
-    return <ErrorPage statusCode={404} />;
-  }
-
   const form = useForm({
     initialValues: {
       authorName: "",
@@ -59,7 +55,11 @@ export default function BlogPost({ post, mostViewPosts }: any) {
     },
   });
 
-  const commentSubmit = async (values) => {
+  if (!router.isFallback && !post?.slug) {
+    return <ErrorPage statusCode={404} />;
+  }
+
+  const commentSubmit = async (values: { authorName: String; content: String; }) => {
     setIsLoading(true);
     if (!values.authorName || !values.content) return;
 
@@ -97,134 +97,134 @@ export default function BlogPost({ post, mostViewPosts }: any) {
           {router.isFallback ? (
             <Loader />
           ) : (
-            <>
-              <Grid.Col md={9}>
-                <Container size="md">
-                  <div className="contant__meta">
-                    <Breadcrumbs separator="|">{items}</Breadcrumbs>
-                    <p>{formatDateInVN(post.date)}</p>
-                  </div>
-                  <h1 style={{ marginTop: "0px" }}>{post.title}</h1>
-                  <div dangerouslySetInnerHTML={{ __html: post.content }} />
-                </Container>
-                <Divider />
-                <Container>
-                  <h3>Bình luận</h3>
-                  <form onSubmit={form.onSubmit(commentSubmit)}>
-                    <TextInput
-                      placeholder="Tên của bạn"
-                      required
-                      disabled={isLoading}
-                      {...form.getInputProps("authorName")}
-                    />
-                    <Space h="sm" />
-                    <Textarea
-                      placeholder="Nhập ý kiến của bạn"
-                      rows={5}
-                      required
-                      disabled={isLoading}
-                      {...form.getInputProps("content")}
-                    />
-                    <Space h="sm" />
-                    <Button
-                      sx={{ float: "right" }}
-                      type="submit"
-                      color="cyan"
-                      variant="light"
-                      loading={isLoading}
-                    >
-                      Đăng bình luận
-                    </Button>
-                  </form>
-                  <Space h="xl" />
-                  {post.comments ? (
-                    post.comments.nodes.map((cmt) => (
-                      <Fragment key={cmt.id}>
-                        <Paper
-                          radius="md"
-                          withBorder
-                          sx={{ padding: "10px 15px" }}
-                        >
-                          <Group>
-                            <Avatar
-                              src={cmt.author.node.avatar.url}
-                              alt="avat"
-                              radius="xl"
-                              size="lg"
-                            />
-                            <div>
-                              <Text size="sm" weight="bold">
-                                {cmt.author.node.name}
-                              </Text>
-                              <Text size="xs" color="dimmed">
-                                {fromDateToNow(cmt.date)}
-                              </Text>
-                            </div>
-                          </Group>
-                          <Text
-                            sx={{ paddingLeft: 72 }}
-                            size="sm"
-                            dangerouslySetInnerHTML={{ __html: cmt.content }}
-                          ></Text>
-                        </Paper>
-                        <Space h="md" />
-                      </Fragment>
-                    ))
-                  ) : (
-                    <></>
-                  )}
-                </Container>
-                {/* <Divider sx={{ margin: "18px 0px" }} /> */}
-              </Grid.Col>
-              <Grid.Col md={3}>
-                <Group sx={{ top: 0, position: "sticky" }}>
-                  {/* <SideNews showtitle /> */}
-                  <SideTabs
-                    mostViewData={mostViewPosts}
-                    secondTabsName="Tin liên quan"
-                    sx={{ marginTop: 10 }}
-                  />
-                  <Paper
-                    sx={{
-                      backgroundColor: "#f1f1f1",
-                      maxHeight: "800px",
-                      flex: "1 !important",
-                    }}
-                  >
-                    <div className="side-news">
-                      <div className="side-news__header">Thẻ bài viết</div>
-                      <Group sx={{ marginLeft: 10 }} spacing="xs">
-                        <Badge
-                          className="side-news__tags"
-                          radius="sm"
-                          color="cyan"
-                          variant="filled"
-                        >
-                          Nga
-                        </Badge>
-                        <Badge
-                          className="side-news__tags"
-                          radius="sm"
-                          color="cyan"
-                          variant="filled"
-                        >
-                          Ukraine
-                        </Badge>
-                        <Badge
-                          className="side-news__tags"
-                          radius="sm"
-                          color="cyan"
-                          variant="filled"
-                        >
-                          Chiến sự
-                        </Badge>
-                      </Group>
+              <>
+                <Grid.Col md={9}>
+                  <Container size="md">
+                    <div className="contant__meta">
+                      <Breadcrumbs separator="|">{items}</Breadcrumbs>
+                      <p>{formatDateInVN(post.date)}</p>
                     </div>
-                  </Paper>
-                </Group>
-              </Grid.Col>
-            </>
-          )}
+                    <h1 style={{ marginTop: "0px" }}>{post.title}</h1>
+                    <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                  </Container>
+                  <Divider />
+                  <Container>
+                    <h3>Bình luận</h3>
+                    <form onSubmit={form.onSubmit(commentSubmit)}>
+                      <TextInput
+                        placeholder="Tên của bạn"
+                        required
+                        disabled={isLoading}
+                        {...form.getInputProps("authorName")}
+                        />
+                      <Space h="sm" />
+                      <Textarea
+                        placeholder="Nhập ý kiến của bạn"
+                        rows={5}
+                        required
+                        disabled={isLoading}
+                        {...form.getInputProps("content")}
+                        />
+                      <Space h="sm" />
+                      <Button
+                        sx={{ float: "right" }}
+                        type="submit"
+                        color="cyan"
+                        variant="light"
+                        loading={isLoading}
+                      >
+                        Đăng bình luận
+                      </Button>
+                    </form>
+                    <Space h="xl" />
+                    {post.comments ? (
+                      post.comments.nodes.map((cmt) => (
+                        <Fragment key={cmt.id}>
+                          <Paper
+                            radius="md"
+                            withBorder
+                            sx={{ padding: "10px 15px" }}
+                          >
+                            <Group>
+                              <Avatar
+                                src={cmt.author.node.avatar.url}
+                                alt="avat"
+                                radius="xl"
+                                size="lg"
+                                />
+                              <div>
+                                <Text size="sm" weight="bold">
+                                  {cmt.author.node.name}
+                                </Text>
+                                <Text size="xs" color="dimmed">
+                                  {fromDateToNow(cmt.date)}
+                                </Text>
+                              </div>
+                            </Group>
+                            <Text
+                              sx={{ paddingLeft: 72 }}
+                              size="sm"
+                              dangerouslySetInnerHTML={{ __html: cmt.content }}
+                            ></Text>
+                          </Paper>
+                          <Space h="md" />
+                        </Fragment>
+                      ))
+                    ) : (
+                        <></>
+                      )}
+                  </Container>
+                  {/* <Divider sx={{ margin: "18px 0px" }} /> */}
+                </Grid.Col>
+                <Grid.Col md={3}>
+                  <Group sx={{ top: 0, position: "sticky" }}>
+                    {/* <SideNews showtitle /> */}
+                    <SideTabs
+                      mostViewData={mostViewPosts}
+                      secondTabsName="Tin liên quan"
+                      sx={{ marginTop: 10 }}
+                      />
+                    <Paper
+                      sx={{
+                        backgroundColor: "#f1f1f1",
+                        maxHeight: "800px",
+                        flex: "1 !important",
+                      }}
+                    >
+                      <div className="side-news">
+                        <div className="side-news__header">Thẻ bài viết</div>
+                        <Group sx={{ marginLeft: 10 }} spacing="xs">
+                          <Badge
+                            className="side-news__tags"
+                            radius="sm"
+                            color="cyan"
+                            variant="filled"
+                          >
+                            Nga
+                          </Badge>
+                          <Badge
+                            className="side-news__tags"
+                            radius="sm"
+                            color="cyan"
+                            variant="filled"
+                          >
+                            Ukraine
+                          </Badge>
+                          <Badge
+                            className="side-news__tags"
+                            radius="sm"
+                            color="cyan"
+                            variant="filled"
+                          >
+                            Chiến sự
+                          </Badge>
+                        </Group>
+                      </div>
+                    </Paper>
+                  </Group>
+                </Grid.Col>
+                </>
+            )}
         </Grid>
       </Container>
     </MainLayout>
