@@ -135,6 +135,7 @@ export default function BlogPost({ post, mostViewPosts }: any) {
                     >
                       Đăng bình luận
                     </Button>
+                    <Space h="xl" />
                   </form>
                   <Space h="xl" />
                   {post.comments ? (
@@ -147,7 +148,10 @@ export default function BlogPost({ post, mostViewPosts }: any) {
                         >
                           <Group>
                             <Avatar
-                              src={cmt.author.node.avatar.url}
+                              src={
+                                cmt.author.node.avatar?.url ||
+                                "/images/placeholder-avatar.webp"
+                              }
                               alt="avat"
                               radius="xl"
                               size="lg"
@@ -246,7 +250,7 @@ export const getStaticProps: GetServerSideProps = async ({ params }) => {
       post: data.post,
       mostViewPosts,
     },
-    revalidate: 10,
+    revalidate: 20,
   };
 };
 
