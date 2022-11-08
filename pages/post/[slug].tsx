@@ -48,10 +48,6 @@ export default function BlogPost({ post, mostViewPosts }: any) {
     );
   });
 
-  if (!router.isFallback && !post?.slug) {
-    return <ErrorPage statusCode={404} />;
-  }
-
   const form = useForm({
     initialValues: {
       authorName: "",
@@ -59,7 +55,11 @@ export default function BlogPost({ post, mostViewPosts }: any) {
     },
   });
 
-  const commentSubmit = async (values) => {
+  if (!router.isFallback && !post?.slug) {
+    return <ErrorPage statusCode={404} />;
+  }
+
+  const commentSubmit = async (values: { authorName: String; content: String; }) => {
     setIsLoading(true);
     if (!values.authorName || !values.content) return;
 
