@@ -27,15 +27,10 @@ const SideTabs: FC<ISideTabs> = ({
         <SideNews data={mostViewData} isMostView={true} />
       </Tabs.Panel>
       <Tabs.Panel value="mostX">
-        {/* //TODO: Add second tabs */}
-        <Paper sx={{ backgroundColor: "#f1f1f1", maxHeight: "800px" }}>
-          <div className="side-news">
-            {false && <div className="side-news__header">Tin đọc nhiều</div>}
-            {secondTabs && secondTabsData && (
-              <SideNews isMostView={false} data={secondTabsData} />
-            )}
-          </div>
-        </Paper>
+        {false && <div className="side-news__header">Tin đọc nhiều</div>}
+        {secondTabs && secondTabsData && (
+          <SideNews isMostView={false} data={secondTabsData} />
+        )}
       </Tabs.Panel>
     </Tabs>
   );
